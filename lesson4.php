@@ -24,8 +24,6 @@ $bd=  parse_ini_string($ini_string, true);
 
 echo '<h3 style="color:#ff3600">Полный список</h3>';
 function parse_basket($basket){
-    global $param;
-    global $name;
     global $kol_order;
     $kol_order=0;
     global $kol_order_all;
@@ -35,75 +33,89 @@ function parse_basket($basket){
     global $bd;
     global $coupon;
     $coupon=0;
-    static $diskont;
-    static $diskont1;
-    static $diskont2;
-
-
-    if($bd['игрушка детская велосипед']['количество заказано']>=3){
-        $coupon= round(($bd['игрушка детская велосипед']['цена']/100)*30);
-    }
+   
+    
     foreach($basket as $name => $param){
-        
-        
         if ($param['количество заказано']>0){
           $kol_order ++;
         }
         $kol_order_all+=$param['количество заказано'];
-        switch ($param['diskont']){
-            case 'diskont1':
-            {
-                $param['diskont']=1;
-                $diskont1=round($param['цена']/10);
-                break;
-            }
-            case 'diskont2':
-            {
-                $param['diskont']=2;
-                $diskont2=round($param['цена']/100*20);
-                break;
-            }
-            default:
-            {
-                $param['diskont']=0;
-                break;
-            }
+        
+        $notification_order=notification_order($param['количество заказано'],$param['осталось на складе']);
+        echo "<br>";
+        echo "<br>";
+        
+        $diskont=$param['diskont'];
+        if ($name == 'игрушка детская велосипед' && $bd['игрушка детская велосипед']['количество заказано']>=3) {
+           $diskont=30;
+           $diskont_all= round(($param['цена']*$param['количество заказано'])/100*30); 
+        }elseif (substr($diskont,7,1)==1){
+            $diskont=10;
+            $diskont_all= round(($param['цена']*$param['количество заказано'])/100*10);
+        }elseif (substr($diskont,7,1)==2){
+            $diskont=20;
+            $diskont_all= round(($param['цена']*$param['количество заказано'])/100*20);
+        }elseif (substr($diskont,7,1)==0) {
+            $diskont=0;
+            $diskont_all=0;
         }
+        
+        $price_products=($param['цена']*$param['количество заказано'])-$diskont_all;
+        $price_all+=$price_products;
         echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Название товара:</span>'.' '.$name;
         echo "<br>";
         echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Цена товара:</span>'.$param['цена'].' '.'руб'."<br>";
         echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Количество заказано:</span>'.$param['количество заказано'].' '.'шт'."<br>";
         echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Осталось на складе:</span>'.$param['осталось на складе'].' '.'шт'."<br>";
-        echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Скидка:</span>'.$param['diskont'].'%'."<br>";
+        echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Скидка:</span>'.$diskont.'%'.' '.'='.' '.$diskont_all."<br>";
+        echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Стоимость товара:</span>'.' '.$price_products;
+        echo $notification_order."<br>";
         echo '<hr>';
-        echo "<br>";
-        $price_all+=$param['цена']*$param['количество заказано'];
+        echo "<br>"; 
     }
-        $price_all=($price_all-$coupon)-$diskont1-$diskont2;
+    
 }
 parse_basket($bd);
-
 echo "Наименовний было заказано:".' '.$kol_order."<br>";
 echo "Общее количество товара:".' '.$kol_order_all."<br>";
 echo "Какова общая сумма заказа(с учетом скидки):".' '.$price_all."<br>";
-echo "Скидка на товар \"игрушка детская велосипед\":".' '.$coupon."<br>";
 echo "<br>";
+$cupon=cupon($bd['игрушка детская велосипед']['количество заказано'], $bd['игрушка детская велосипед']['цена']);
+echo $cupon."<br>";
+
 
 function notification($string, $sign="С уважением, магазин \"Подарки\""){
     echo $string ." ".$sign;
 }
 function show_text(){
-    echo "Отправить сообщение на почту покупателя<br>";  
+    echo '<span style="margin:0 10px 0 0; color:red; float:left;">Уведомление</span><br>';  
 }
-$func = "show_text";
-$func();
-$func = "notification";
-$func("Здравствуйте, username!<br> Данного товара на складе нету.<br>");
+function notification_order($order, $balance_in_stock){
+   if ($order>$balance_in_stock){
+        $func = "show_text";
+        $func();
+        $func = "notification";
+        $func("Здравствуйте, username!<br> Данного товара на складе нету.<br>");
+    }  else {
+        $func = "show_text";
+        $func();
+        $func = "notification";
+        $func("Здравствуйте, username!<br> Спасибо за покупку!<br>");
+    } 
+}
 
-echo "<br>";
-echo "<br>";
-$coupon= "show_text";
-$coupon();
-$coupon= "notification";
-$coupon("Здравствуйте, username!<br> Вам была сделанны скидка 30% на товар \"игрушка детская велосипед\"<br>");
+function cupon($kol, $price){
+    if($kol>=3){
+        $coupon= round(($price/100)*30);
+        $coupon_show = "show_text";
+        $coupon_show();
+        $coupon_show= "notification";
+        $coupon_show("Здравствуйте, username!<br> Вам была сделанны скидка 30% на товар \"игрушка детская велосипед\"<br>");
+    }
+}
 
+
+
+    
+
+    
