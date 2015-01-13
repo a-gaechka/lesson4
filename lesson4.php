@@ -87,12 +87,6 @@ function parse_basket($basket){
              $price_all+=$price_products;
         }
         
-        
-        //-----------------------------------------------
-        
-       
-        
-        //----------------------------------------------
         echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Название товара:</span>'.' '.$name;
         echo "<br>";
         echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Цена товара:</span>'.$param['цена'].' '.'руб'."<br>";
