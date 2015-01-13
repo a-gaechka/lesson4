@@ -31,15 +31,11 @@ function parse_basket($basket){
     global $price_all;
     $price_all=0;
     global $bd;
-    global $coupon;
-    $coupon=0;
-   
     
     foreach($basket as $name => $param){
         if ($param['количество заказано']>0){
           $kol_order ++;
-        }
-        $kol_order_all+=$param['количество заказано'];
+        } 
         
         $notification_order=notification_order($param['количество заказано'],$param['осталось на складе']);
         echo "<br>";
@@ -62,7 +58,7 @@ function parse_basket($basket){
                  $diskont=0;
                  $diskont_all=0;
              }
-
+             $kol_order_all+=$param['осталось на складе'];
              $price_products=($param['цена']*$param['осталось на складе'])-$diskont_all;
              $price_all+=$price_products;
         }  else {
@@ -82,7 +78,7 @@ function parse_basket($basket){
                  $diskont=0;
                  $diskont_all=0;
              }
-
+             $kol_order_all+=$param['количество заказано'];
              $price_products=($param['цена']*$param['количество заказано'])-$diskont_all;
              $price_all+=$price_products;
         }
