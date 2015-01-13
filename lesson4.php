@@ -44,24 +44,55 @@ function parse_basket($basket){
         $notification_order=notification_order($param['количество заказано'],$param['осталось на складе']);
         echo "<br>";
         echo "<br>";
-        
         $diskont=$param['diskont'];
-        if ($name == 'игрушка детская велосипед' && $bd['игрушка детская велосипед']['количество заказано']>=3) {
-           $diskont=30;
-           $diskont_all= round(($param['цена']*$param['количество заказано'])/100*30); 
-        }elseif (substr($diskont,7,1)==1){
-            $diskont=10;
-            $diskont_all= round(($param['цена']*$param['количество заказано'])/100*10);
-        }elseif (substr($diskont,7,1)==2){
-            $diskont=20;
-            $diskont_all= round(($param['цена']*$param['количество заказано'])/100*20);
-        }elseif (substr($diskont,7,1)==0) {
-            $diskont=0;
-            $diskont_all=0;
+        if($param['количество заказано']>$param['осталось на складе']){
+            if ($name == 'игрушка детская велосипед' && $bd['игрушка детская велосипед']['количество заказано']>=3) {
+                $diskont=30;
+                $diskont_all= round((($param['цена']*$param['осталось на складе'])/100*30), 2); 
+                $cupon=cupon($bd['игрушка детская велосипед']['количество заказано'], $bd['игрушка детская велосипед']['цена']);
+                echo $cupon."<br>";
+                echo '<br>';
+             }elseif (substr($diskont,7,1)==1){
+                 $diskont=10;
+                 $diskont_all= round((($param['цена']*$param['осталось на складе'])/100*10),2);
+             }elseif (substr($diskont,7,1)==2){
+                 $diskont=20;
+                 $diskont_all= round((($param['цена']*$param['осталось на складе'])/100*20),2);
+             }elseif (substr($diskont,7,1)==0) {
+                 $diskont=0;
+                 $diskont_all=0;
+             }
+
+             $price_products=($param['цена']*$param['осталось на складе'])-$diskont_all;
+             $price_all+=$price_products;
+        }  else {
+             if ($name == 'игрушка детская велосипед' && $bd['игрушка детская велосипед']['количество заказано']>=3) {
+                $diskont=30;
+                $diskont_all= round((($param['цена']*$param['количество заказано'])/100*30), 2); 
+                $cupon=cupon($bd['игрушка детская велосипед']['количество заказано'], $bd['игрушка детская велосипед']['цена']);
+                echo $cupon."<br>";
+                echo '<br>';
+             }elseif (substr($diskont,7,1)==1){
+                 $diskont=10;
+                 $diskont_all= round((($param['цена']*$param['количество заказано'])/100*10),2);
+             }elseif (substr($diskont,7,1)==2){
+                 $diskont=20;
+                 $diskont_all= round((($param['цена']*$param['количество заказано'])/100*20),2);
+             }elseif (substr($diskont,7,1)==0) {
+                 $diskont=0;
+                 $diskont_all=0;
+             }
+
+             $price_products=($param['цена']*$param['количество заказано'])-$diskont_all;
+             $price_all+=$price_products;
         }
         
-        $price_products=($param['цена']*$param['количество заказано'])-$diskont_all;
-        $price_all+=$price_products;
+        
+        //-----------------------------------------------
+        
+       
+        
+        //----------------------------------------------
         echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Название товара:</span>'.' '.$name;
         echo "<br>";
         echo '<span style="margin:0 10px 0 0; color:#555; float:left;">Цена товара:</span>'.$param['цена'].' '.'руб'."<br>";
@@ -80,8 +111,7 @@ echo "Наименовний было заказано:".' '.$kol_order."<br>";
 echo "Общее количество товара:".' '.$kol_order_all."<br>";
 echo "Какова общая сумма заказа(с учетом скидки):".' '.$price_all."<br>";
 echo "<br>";
-$cupon=cupon($bd['игрушка детская велосипед']['количество заказано'], $bd['игрушка детская велосипед']['цена']);
-echo $cupon."<br>";
+
 
 
 function notification($string, $sign="С уважением, магазин \"Подарки\""){
@@ -95,7 +125,7 @@ function notification_order($order, $balance_in_stock){
         $func = "show_text";
         $func();
         $func = "notification";
-        $func("Здравствуйте, username!<br> Данного товара на складе нету.<br>");
+        $func("Здравствуйте, username!<br> Данного товара недостаточно на складе.<br>");
     }  else {
         $func = "show_text";
         $func();
