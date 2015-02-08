@@ -24,11 +24,8 @@ $bd=  parse_ini_string($ini_string, true);
 
 echo '<h3 style="color:#ff3600">Полный список</h3>';
 function parse_basket($basket){
-    global $kol_order;
     $kol_order=0;
-    global $kol_order_all;
     $kol_order_all=0;
-    global $price_all;
     $price_all=0;
     global $bd;
     
@@ -94,15 +91,12 @@ function parse_basket($basket){
         echo '<hr>';
         echo "<br>"; 
     }
-    
+    echo "Наименовний было заказано:".' '.$kol_order."<br>";
+    echo "Общее количество товара:".' '.$kol_order_all."<br>";
+    echo "Какова общая сумма заказа(с учетом скидки):".' '.$price_all."<br>";
+    echo "<br>";
 }
 parse_basket($bd);
-echo "Наименовний было заказано:".' '.$kol_order."<br>";
-echo "Общее количество товара:".' '.$kol_order_all."<br>";
-echo "Какова общая сумма заказа(с учетом скидки):".' '.$price_all."<br>";
-echo "<br>";
-
-
 
 function notification($string, $sign="С уважением, магазин \"Подарки\""){
     echo $string ." ".$sign;
